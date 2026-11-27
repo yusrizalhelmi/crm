@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#FAFAF5">
+<meta name="description" content="Mini CRM - Kelola pelanggan, interaksi, dan penjualan Anda. Data tersimpan di perangkat Anda.">
+<title>Mini CRM — Customer Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============ RESET & BASE ============ */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --cream:#FAFAF5;
+  --cream-2:#F4F2E8;
+  --yellow:#F5E625;
+  --yellow-soft:#F8ED6A;
+  --cyan:#3BC8F5;
+  --cyan-soft:#7AD8F8;
+  --khaki:#D6C96A;
+  --khaki-soft:#E2D98C;
+  --magenta:#E9A8F0;
+  --magenta-soft:#F0C2F5;
+  --dark:#1A1A1A;
+  --dark-2:#2A2A2A;
+  --gray:#9C9C9C;
+  --gray-2:#6B6B6B;
+  --gray-3:#E8E6DE;
+  --white:#FFFFFF;
+  --green:#34C759;
+  --red:#FF3B30;
+  --shadow:0 8px 24px rgba(0,0,0,0.06);
+  --shadow-sm:0 4px 12px rgba(0,0,0,0.05);
+  --shadow-lg:0 16px 40px rgba(0,0,0,0.12);
+  --r-card:24px;
+  --r-chip:999px;
+  --r-cell:12px;
+  --maxw:520px;
+}
+html,body{height:100%}
+body{
+  font-family:'Poppins',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--cream);
+  color:var(--dark);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:inherit;color:inherit;outline:none}
+img{max-width:100%;height:auto;display:block}
+::selection{background:var(--yellow);color:var(--dark)}
+
+/* ============ APP SHELL ============ */
+.app{
+  max-width:var(--maxw);
+  margin:0 auto;
+  min-height:100vh;
+  min-height:100dvh;
+  background:var(--cream);
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 0 60px rgba(0,0,0,0.04);
+}
+
+/* ============ HEADER ============ */
+.header{
+  padding:18px 20px 14px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  position:sticky;
+  top:0;
+  background:var(--cream);
+  z-index:50;
+  backdrop-filter:blur(8px);
+}
+.header.is-dark{background:#1C1C1C;color:#fff}
+.h-title{
+  flex:1;
+  font-size:20px;
+  font-weight:600;
+  line-height:1.25;
+  letter-spacing:-0.3px;
+}
+.h-title .sub{display:block;font-size:12px;font-weight:400;color:var(--gray);margin-top:2px}
+.h-btn{
+  width:42px;height:42px;
+  border-radius:50%;
+  background:var(--dark);
+  color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  box-shadow:var(--shadow-sm);
+  transition:transform .15s;
+}
+.h-btn:active{transform:scale(.92)}
+.h-btn.light{background:#fff;color:var(--dark)}
+.h-btn svg{width:20px;height:20px}
+.h-btn.is-active{background:var(--yellow);color:var(--dark)}
+
+/* ============ MAIN ============ */
+.main{
+  flex:1;
+  padding:0 20px 110px;
+  width:100%;
+}
+.screen{display:none;animation:fadeIn .3s ease}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ============ FILTER CHIPS ============ */
+.chips{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:6px 0 14px;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 8px,#000 calc(100% - 8px),transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0,#000 8px,#000 calc(100% - 8px),transparent 100%);
+}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex-shrink:0;
+  padding:8px 18px;
+  border-radius:var(--r-chip);
+  background:transparent;
+  border:1.5px solid var(--gray-3);
+  color:var(--gray-2);
+  font-size:13px;
+  font-weight:500;
+  transition:all .2s;
+  white-space:nowrap;
+}
+.chip.active{
+  background:var(--dark);
+  border-color:var(--dark);
+  color:#fff;
+}
+
+/* ============ STATS GRID (Dashboard) ============ */
+.greet{padding:6px 0 18px}
+.greet h2{font-size:24px;font-weight:700;line-height:1.2;letter-spacing:-0.4px}
+.greet p{color:var(--gray);font-size:13px;margin-top:4px}
+
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+  margin-bottom:20px;
+}
+.stat-card{
+  background:var(--white);
+  border-radius:var(--r-card);
+  padding:16px;
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
+}
+.stat-card .ico{
+  width:38px;height:38px;
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:12px;
+}
+.stat-card .ico svg{width:20px;height:20px}
+.stat-card .val{font-size:26px;font-weight:700;letter-spacing:-0.5px;line-height:1}
+.stat-card .lbl{font-size:11.5px;color:var(--gray);margin-top:6px;font-weight:500}
+.stat-card .trend{font-size:11px;margin-top:8px;font-weight:600;display:inline-flex;align-items:center;gap:3px}
+.stat-card .trend.up{color:var(--green)}
+.stat-card .trend.down{color:var(--red)}
+.ico.yellow{background:var(--yellow);color:var(--dark)}
+.ico.cyan{background:var(--cyan);color:#fff}
+.ico.khaki{background:var(--khaki);color:var(--dark)}
+.ico.magenta{background:var(--magenta);color:var(--dark)}
+.ico.dark{background:var(--dark);color:#fff}
+
+/* ============ SECTION TITLE ============ */
+.sec-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin:8px 0 12px;
+}
+.sec-title h3{font-size:16px;font-weight:600}
+.sec-title a{font-size:12px;color:var(--gray-2);font-weight:500;text-decoration:none;display:flex;align-items:center;gap:2px}
+.sec-title a svg{width:14px;height:14px}
+
+/* ============ CUSTOMER GRID ============ */
+.cust-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+.cust-card{
+  background:var(--white);
+  border-radius:var(--r-card);
+  padding:14px;
+  box-shadow:var(--shadow);
+  position:relative;
+  cursor:pointer;
+  transition:transform .15s,box-shadow .15s;
+  min-height:160px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.cust-card:active{transform:scale(.97)}
+.cust-card.selected{
+  background:var(--yellow);
+  border:2px solid var(--dark);
+  padding:12px;
+}
+.cust-card.disabled{opacity:.5}
+.cust-avatar{
+  width:42px;height:42px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;
+  font-size:16px;
+  color:#fff;
+  margin-bottom:10px;
+  flex-shrink:0;
+  background-size:cover;
+  background-position:center;
+}
+.cust-card.selected .cust-avatar{width:52px;height:52px;font-size:18px}
+.cust-name{
+  font-size:14px;
+  font-weight:600;
+  line-height:1.25;
+  margin-bottom:3px;
+  word-break:break-word;
+}
+.cust-sub{
+  font-size:10px;
+  color:var(--gray);
+  line-height:1.35;
+  margin-bottom:auto;
+  display:-webkit-box !important;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  word-break:break-word;
+  min-width:0;
+  width:100%;
+}
+.cust-income{
+  font-size:11px;
+  color:var(--gray-2);
+  font-weight:500;
+  margin-top:10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.cust-card.selected .cust-income{
+  background:var(--dark);
+  color:#fff;
+  border-radius:var(--r-chip);
+  padding:6px 10px;
+  font-size:11px;
+}
+.cust-card.selected .cust-income .arrow{
+  width:22px;height:22px;
+  background:var(--dark);
+  color:#fff;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+.cust-card.selected .cust-income .arrow svg{width:14px;height:14px}
+.cust-status-dot{
+  position:absolute;
+  top:14px;right:14px;
+  width:8px;height:8px;
+  border-radius:50%;
+}
+.cust-card.selected .cust-status-dot{top:12px;right:12px}
+
+/* ============ SEARCH ============ */
+.search-wrap{
+  position:relative;
+  margin-bottom:14px;
+}
+.search-wrap svg{
+  position:absolute;
+  left:16px;top:50%;
+  transform:translateY(-50%);
+  width:18px;height:18px;
+  color:var(--gray);
+}
+.search-input{
+  width:100%;
+  background:var(--white);
+  border:1.5px solid transparent;
+  border-radius:var(--r-chip);
+  padding:12px 16px 12px 44px;
+  font-size:14px;
+  box-shadow:var(--shadow-sm);
+  transition:border .2s;
+}
+.search-input:focus{border-color:var(--dark)}
+
+/* ============ CUSTOMER DETAIL ============ */
+.detail-hero{
+  background:var(--white);
+  border-radius:28px;
+  padding:24px 20px;
+  box-shadow:var(--shadow);
+  text-align:center;
+  margin-bottom:16px;
+}
+.detail-avatar{
+  width:96px;height:96px;
+  border-radius:50%;
+  margin:0 auto 12px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;
+  font-size:34px;
+  color:#fff;
+  background-size:cover;
+  background-position:center;
+  box-shadow:0 0 0 8px rgba(245,230,37,0.25);
+}
+.detail-name{font-size:20px;font-weight:700;letter-spacing:-0.3px}
+.detail-role{font-size:12px;color:var(--gray);margin-top:3px;line-height:1.4}
+.detail-actions{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:16px;
+}
+.act-btn{
+  width:42px;height:42px;
+  border-radius:50%;
+  background:var(--white);
+  box-shadow:var(--shadow-sm);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--dark);
+  transition:transform .15s;
+  border:1px solid var(--gray-3);
+}
+.act-btn:active{transform:scale(.9)}
+.act-btn.dark{background:var(--dark);color:#fff;border-color:var(--dark)}
+.act-btn svg{width:18px;height:18px}
+
+.info-card{
+  background:var(--white);
+  border-radius:var(--r-card);
+  padding:18px;
+  box-shadow:var(--shadow);
+  margin-bottom:14px;
+}
+.info-row{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  padding:10px 0;
+  border-bottom:1px solid var(--gray-3);
+}
+.info-row:last-child{border-bottom:none;padding-bottom:0}
+.info-row:first-child{padding-top:0}
+.info-row .ico-sm{
+  width:32px;height:32px;
+  border-radius:10px;
+  background:var(--cream-2);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.info-row .ico-sm svg{width:16px;height:16px;color:var(--gray-2)}
+.info-row .lbl{font-size:11px;color:var(--gray);font-weight:500}
+.info-row .val{font-size:13.5px;font-weight:500;word-break:break-word}
+
+/* ============ INTERACTION CARDS ============ */
+.inter-card{
+  border-radius:var(--r-card);
+  padding:18px;
+  margin-bottom:12px;
+  position:relative;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.inter-card.cyan{background:var(--cyan);color:#fff}
+.inter-card.yellow{background:var(--yellow);color:var(--dark)}
+.inter-card.khaki{background:var(--khaki);color:var(--dark)}
+.inter-card.magenta{background:var(--magenta);color:var(--dark)}
+.inter-card .i-date{font-size:11px;font-weight:600;opacity:.85;margin-bottom:4px}
+.inter-card .i-title{font-size:16px;font-weight:600;line-height:1.3;margin-bottom:8px;padding-right:32px}
+.inter-card .i-amt{font-size:24px;font-weight:700;letter-spacing:-0.5px}
+.inter-card .i-amt small{font-size:13px;font-weight:500;opacity:.8}
+.inter-card .i-note{font-size:12px;opacity:.85;margin-top:6px;line-height:1.4}
+.inter-card .i-arrow{
+  position:absolute;
+  top:18px;right:18px;
+  width:32px;height:32px;
+  border-radius:50%;
+  background:rgba(0,0,0,0.12);
+  display:flex;align-items:center;justify-content:center;
+}
+.inter-card.yellow .i-arrow,.inter-card.khaki .i-arrow,.inter-card.magenta .i-arrow{background:rgba(0,0,0,0.15);color:var(--dark)}
+.inter-card.cyan .i-arrow{color:#fff}
+.inter-card .i-arrow svg{width:16px;height:16px}
+.inter-card .i-meta{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:12px;
+  font-size:11px;
+  opacity:.85;
+}
+.inter-card .i-cust{font-weight:600}
+
+/* ============ EMPTY STATE ============ */
+.empty{
+  text-align:center;
+  padding:50px 20px;
+  color:var(--gray);
+}
+.empty svg{width:48px;height:48px;margin:0 auto 14px;opacity:.4}
+.empty p{font-size:14px;font-weight:500}
+.empty span{font-size:12px;display:block;margin-top:4px}
+
+/* ============ BOTTOM NAV ============ */
+.bottom-nav{
+  position:fixed;
+  bottom:0;left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:var(--maxw);
+  background:var(--white);
+  border-top:1px solid var(--gray-3);
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+  z-index:100;
+  box-shadow:0 -4px 20px rgba(0,0,0,0.04);
+}
+.nav-item{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+  color:var(--gray);
+  font-size:10px;
+  font-weight:500;
+  padding:4px;
+  transition:color .2s;
+}
+.nav-item svg{width:22px;height:22px}
+.nav-item.active{color:var(--dark)}
+.nav-item.active svg{color:var(--dark)}
+.nav-fab{
+  width:54px;height:54px;
+  border-radius:50%;
+  background:var(--dark);
+  color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 8px 20px rgba(0,0,0,0.25);
+  margin-top:-22px;
+  transition:transform .15s;
+}
+.nav-fab:active{transform:scale(.9)}
+.nav-fab svg{width:26px;height:26px}
+
+/* ============ FLOATING WHATSAPP ============ */
+.wa-float{
+  position:fixed;
+  bottom:82px;
+  right:18px;
+  width:46px;height:46px;
+  border-radius:50%;
+  background:#25D366;
+  color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(37,211,102,0.4);
+  z-index:90;
+  transition:transform .15s;
+}
+.wa-float:active{transform:scale(.9)}
+.wa-float svg{width:24px;height:24px}
+@media(min-width:560px){
+  .wa-float{right:max(20px,calc(50% - var(--maxw)/2 + 20px))}
+}
+
+/* ============ MODAL ============ */
+.modal-bg{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.5);
+  z-index:200;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  animation:fadeInBg .25s;
+}
+.modal-bg.show{display:flex}
+@keyframes fadeInBg{from{opacity:0}to{opacity:1}}
+.modal{
+  background:var(--cream);
+  width:100%;
+  max-width:var(--maxw);
+  border-radius:28px 28px 0 0;
+  padding:8px 20px calc(20px + env(safe-area-inset-bottom));
+  max-height:92vh;
+  overflow-y:auto;
+  animation:slideUp .3s cubic-bezier(.16,1,.3,1);
+  display:flex;
+  flex-direction:column;
+}
+.modal .modal-body{flex:1;overflow-y:auto;margin:0 -20px;padding:0 20px}
+.modal .btn-row{
+  position:sticky;
+  bottom:0;
+  background:var(--cream);
+  padding-top:10px;
+  margin-top:12px;
+  z-index:2;
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
+.modal-grip{
+  width:40px;height:5px;
+  background:var(--gray-3);
+  border-radius:99px;
+  margin:0 auto 16px;
+}
+.modal-title{
+  font-size:20px;
+  font-weight:600;
+  margin-bottom:18px;
+  letter-spacing:-0.3px;
+}
+
+/* ============ FORM ============ */
+.form-group{margin-bottom:14px}
+.form-label{
+  display:block;
+  font-size:12px;
+  font-weight:600;
+  color:var(--gray-2);
+  margin-bottom:6px;
+}
+.form-input,.form-select,.form-textarea{
+  width:100%;
+  background:var(--white);
+  border:1.5px solid var(--gray-3);
+  border-radius:14px;
+  padding:13px 14px;
+  font-size:14px;
+  transition:border .2s,box-shadow .2s;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{
+  border-color:var(--dark);
+  box-shadow:0 0 0 3px rgba(26,26,26,0.06);
+}
+.form-textarea{resize:vertical;min-height:80px;font-family:inherit}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.color-pick{display:flex;gap:8px;flex-wrap:wrap}
+.color-opt{
+  width:36px;height:36px;
+  border-radius:12px;
+  cursor:pointer;
+  border:3px solid transparent;
+  transition:transform .15s,border .15s;
+}
+.color-opt:active{transform:scale(.9)}
+.color-opt.active{border-color:var(--dark)}
+.color-opt.cyan{background:var(--cyan)}
+.color-opt.yellow{background:var(--yellow)}
+.color-opt.khaki{background:var(--khaki)}
+.color-opt.magenta{background:var(--magenta)}
+.status-pick{display:flex;gap:8px;flex-wrap:wrap}
+.status-opt{
+  padding:8px 14px;
+  border-radius:99px;
+  border:1.5px solid var(--gray-3);
+  font-size:12px;
+  font-weight:500;
+  color:var(--gray-2);
+  cursor:pointer;
+  transition:all .15s;
+}
+.status-opt.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+
+.btn{
+  width:100%;
+  padding:15px;
+  border-radius:16px;
+  font-size:15px;
+  font-weight:600;
+  transition:transform .15s,opacity .15s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--dark);color:#fff}
+.btn-yellow{background:var(--yellow);color:var(--dark)}
+.btn-ghost{background:var(--white);color:var(--gray-2);border:1.5px solid var(--gray-3)}
+.btn svg{width:18px;height:18px}
+.btn-row{display:flex;gap:10px;margin-top:8px}
+
+/* ============ GUIDE ============ */
+.guide-intro{
+  background:linear-gradient(135deg,var(--yellow),var(--yellow-soft));
+  border-radius:var(--r-card);
+  padding:22px;
+  margin-bottom:16px;
+  text-align:center;
+  box-shadow:var(--shadow);
+}
+.guide-intro h2{font-size:20px;font-weight:700;margin-bottom:6px}
+.guide-intro p{font-size:13px;color:var(--dark);opacity:.8}
+.guide-step{
+  background:var(--white);
+  border-radius:var(--r-card);
+  padding:18px;
+  margin-bottom:12px;
+  box-shadow:var(--shadow);
+  display:flex;
+  gap:14px;
+}
+.guide-num{
+  width:36px;height:36px;
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;
+  font-size:16px;
+  flex-shrink:0;
+}
+.guide-step h4{font-size:15px;font-weight:600;margin-bottom:4px}
+.guide-step p{font-size:13px;color:var(--gray-2);line-height:1.5}
+.wa-cta{
+  background:#25D366;
+  color:#fff;
+  border-radius:var(--r-card);
+  padding:20px;
+  text-align:center;
+  margin-top:16px;
+  box-shadow:0 8px 24px rgba(37,211,102,0.3);
+}
+.wa-cta h3{font-size:17px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:8px}
+.wa-cta p{font-size:12.5px;opacity:.95;margin-bottom:14px;line-height:1.5}
+.wa-cta-btn{
+  background:#fff;
+  color:#25D366;
+  padding:12px 24px;
+  border-radius:99px;
+  font-weight:700;
+  font-size:14px;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  transition:transform .15s;
+}
+.wa-cta-btn:active{transform:scale(.95)}
+.wa-cta-btn svg{width:18px;height:18px}
+
+/* ============ TOAST ============ */
+.toast{
+  position:fixed;
+  bottom:100px;
+  left:50%;
+  transform:translateX(-50%) translateY(100px);
+  background:var(--dark);
+  color:#fff;
+  padding:12px 22px;
+  border-radius:99px;
+  font-size:13px;
+  font-weight:500;
+  z-index:300;
+  box-shadow:var(--shadow-lg);
+  opacity:0;
+  transition:transform .3s,opacity .3s;
+  max-width:90%;
+  text-align:center;
+}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast svg{width:16px;height:16px;vertical-align:-3px;margin-right:6px;color:var(--green)}
+
+/* ============ CALENDAR (mini) ============ */
+.cal-card{
+  background:var(--yellow);
+  border-radius:var(--r-card);
+  padding:18px;
+  box-shadow:var(--shadow);
+  margin-bottom:14px;
+}
+.cal-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:14px;
+}
+.cal-head h3{font-size:22px;font-weight:700}
+.cal-head .cal-arrows{display:flex;gap:8px}
+.cal-arrow{
+  width:32px;height:32px;
+  border-radius:50%;
+  background:var(--dark);
+  color:#fff;
+  display:flex;align-items:center;justify-content:center;
+}
+.cal-arrow svg{width:16px;height:16px}
+.cal-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:5px;
+}
+.cal-dow{
+  text-align:center;
+  font-size:10px;
+  font-weight:600;
+  color:var(--dark);
+  opacity:.6;
+  padding:4px 0;
+}
+.cal-day{
+  aspect-ratio:1;
+  border-radius:10px;
+  background:rgba(255,255,255,0.6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:500;
+  position:relative;
+}
+.cal-day.today{background:var(--dark);color:#fff;font-weight:700}
+.cal-day.has-task::after{
+  content:'';
+  position:absolute;
+  bottom:3px;
+  width:5px;height:5px;
+  border-radius:50%;
+  background:var(--cyan);
+}
+.cal-day.today.has-task::after{background:var(--yellow)}
+.cal-day.empty{background:transparent}
+
+/* ============ DATA MANAGE ============ */
+.data-card{
+  background:var(--white);
+  border-radius:var(--r-card);
+  padding:18px;
+  box-shadow:var(--shadow);
+  margin-bottom:12px;
+}
+.data-card h4{font-size:15px;font-weight:600;margin-bottom:4px}
+.data-card p{font-size:12px;color:var(--gray);margin-bottom:14px;line-height:1.5}
+
+/* ============ RESPONSIVE ============ */
+@media(min-width:560px){
+  .cust-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:380px){
+  .stats-grid{gap:10px}
+  .stat-card{padding:13px}
+  .stat-card .val{font-size:22px}
+  .cust-grid{gap:10px}
+  .cust-card{padding:12px;min-height:150px}
+  .h-title{font-size:18px}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <button class="h-btn" id="hBack" style="display:none" onclick="goBack()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="h-title" id="hTitle">Dashboard</div>
+    <button class="h-btn" id="hSearch" onclick="openSearch()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    </button>
+    <button class="h-btn" id="hStar" style="display:none" onclick="toggleFav()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    </button>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main" id="main">
+
+    <!-- ========== DASHBOARD ========== -->
+    <section class="screen active" id="screen-dashboard">
+      <div class="greet">
+        <h2 id="greetTitle">Halo 👋</h2>
+        <p id="greetSub">Berikut ringkasan CRM Anda hari ini.</p>
+      </div>
+      <div class="stats-grid" id="statsGrid"></div>
+
+      <div class="sec-title">
+        <h3>Pelanggan Terbaru</h3>
+        <a href="#" onclick="nav('customers');return false">Lihat semua
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        </a>
+      </div>
+      <div class="cust-grid" id="recentCust"></div>
+
+      <div class="sec-title" style="margin-top:20px">
+        <h3>Interaksi Terbaru</h3>
+        <a href="#" onclick="nav('interactions');return false">Lihat semua
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        </a>
+      </div>
+      <div id="recentInter"></div>
+    </section>
+
+    <!-- ========== CUSTOMERS ========== -->
+    <section class="screen" id="screen-customers">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" class="search-input" id="custSearch" placeholder="Cari pelanggan..." oninput="renderCustomers()">
+      </div>
+      <div class="chips" id="custChips"></div>
+      <div class="cust-grid" id="custGrid"></div>
+    </section>
+
+    <!-- ========== CUSTOMER DETAIL ========== -->
+    <section class="screen" id="screen-detail">
+      <div class="detail-hero" id="detailHero"></div>
+      <div class="info-card">
+        <div class="sec-title" style="margin-bottom:8px">
+          <h3>Informasi Detail</h3>
+          <a href="#" onclick="editCustomer(currentId);return false">Edit
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </a>
+        </div>
+        <div id="detailInfo"></div>
+      </div>
+      <div class="sec-title">
+        <h3>Interaksi Pelanggan</h3>
+        <a href="#" onclick="openInterModal(currentId);return false">+ Tambah</a>
+      </div>
+      <div id="detailInter"></div>
+      <div style="margin-top:20px">
+        <button class="btn btn-ghost" onclick="deleteCustomer(currentId)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Hapus Pelanggan
+        </button>
+      </div>
+    </section>
+
+    <!-- ========== INTERACTIONS ========== -->
+    <section class="screen" id="screen-interactions">
+      <div class="chips" id="interChips"></div>
+      <div id="interList"></div>
+    </section>
+
+    <!-- ========== GUIDE ========== -->
+    <section class="screen" id="screen-guide">
+      <div class="guide-intro">
+        <h2>Panduan Penggunaan</h2>
+        <p>Belajar mengelola pelanggan & interaksi dalam 6 langkah mudah.</p>
+      </div>
+      <div id="guideSteps"></div>
+
+      <div class="sec-title" style="margin-top:20px">
+        <h3>Kelola Data</h3>
+      </div>
+      <div class="data-card">
+        <h4>Ekspor Data (Backup)</h4>
+        <p>Unduh semua data pelanggan & interaksi Anda dalam format JSON. Simpan sebagai cadangan.</p>
+        <button class="btn btn-yellow" onclick="exportData()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>
+          Ekspor JSON
+        </button>
+      </div>
+      <div class="data-card">
+        <h4>Impor Data</h4>
+        <p>Pulihkan data dari file backup JSON. Data saat ini akan ditimpa.</p>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+        <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg>
+          Pilih File JSON
+        </button>
+      </div>
+      <div class="data-card">
+        <h4>Reset Data</h4>
+        <p>Hapus semua data dan muat ulang data contoh awal. Tindakan ini tidak dapat dibatalkan.</p>
+        <button class="btn btn-ghost" style="color:var(--red)" onclick="resetData()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Reset ke Data Contoh
+        </button>
+      </div>
+
+      <div class="wa-cta">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.037zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+          Butuh Bantuan?
+        </h3>
+        <p>Hubungi saya via WhatsApp untuk pertanyaan, saran, atau bantuan penggunaan aplikasi CRM ini.</p>
+        <a href="#" onclick="openWA('Halo, saya butuh bantuan penggunaan aplikasi CRM.');return false" class="wa-cta-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.037zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+          Chat WhatsApp
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-nav="dashboard" onclick="nav('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+      Beranda
+    </button>
+    <button class="nav-item" data-nav="customers" onclick="nav('customers')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Pelanggan
+    </button>
+    <button class="nav-fab" onclick="openCustModal()" aria-label="Tambah">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+    <button class="nav-item" data-nav="interactions" onclick="nav('interactions')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      Interaksi
+    </button>
+    <button class="nav-item" data-nav="guide" onclick="nav('guide')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+      Panduan
+    </button>
+  </nav>
+
+  <!-- WHATSAPP FLOAT -->
+  <a href="#" class="wa-float" onclick="openWA('Halo, saya ingin bertanya tentang aplikasi CRM.');return false" aria-label="WhatsApp">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.037zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+  </a>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- MODAL: CUSTOMER FORM -->
+  <div class="modal-bg" id="custModalBg" onclick="if(event.target===this)closeCustModal()">
+    <div class="modal">
+      <div class="modal-grip"></div>
+      <div class="modal-title" id="custModalTitle">Tambah Pelanggan</div>
+      <input type="hidden" id="custId">
+      <div class="form-group">
+        <label class="form-label">Nama Pelanggan *</label>
+        <input type="text" class="form-input" id="fName" placeholder="Contoh: Budi Santoso">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Perusahaan</label>
+        <input type="text" class="form-input" id="fCompany" placeholder="Contoh: PT Maju Jaya">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Jabatan / Posisi</label>
+        <input type="text" class="form-input" id="fPosition" placeholder="Contoh: CEO, Manajer Pembelian">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="fEmail" placeholder="nama@email.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telepon</label>
+          <input type="tel" class="form-input" id="fPhone" placeholder="08xx...">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <div class="status-pick" id="statusPick"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pendapatan Awal (Rp)</label>
+        <input type="number" class="form-input" id="fIncome" placeholder="0" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Catatan</label>
+        <textarea class="form-textarea" id="fNote" placeholder="Catatan tambahan tentang pelanggan..."></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="closeCustModal()">Batal</button>
+        <button class="btn btn-primary" onclick="saveCustomer()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: INTERACTION FORM -->
+  <div class="modal-bg" id="interModalBg" onclick="if(event.target===this)closeInterModal()">
+    <div class="modal">
+      <div class="modal-grip"></div>
+      <div class="modal-title">Tambah Interaksi</div>
+      <input type="hidden" id="interId">
+      <div class="form-group">
+        <label class="form-label">Pelanggan *</label>
+        <select class="form-select" id="fCust"></select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tanggal</label>
+          <input type="date" class="form-input" id="fDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nominal (Rp)</label>
+          <input type="number" class="form-input" id="fAmt" placeholder="0" min="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Judul Interaksi *</label>
+        <input type="text" class="form-input" id="fTitle" placeholder="Contoh: Penawaran Paket Royal">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Warna Kartu</label>
+        <div class="color-pick" id="colorPick">
+          <div class="color-opt cyan active" data-color="cyan" onclick="pickColor(this)"></div>
+          <div class="color-opt yellow" data-color="yellow" onclick="pickColor(this)"></div>
+          <div class="color-opt khaki" data-color="khaki" onclick="pickColor(this)"></div>
+          <div class="color-opt magenta" data-color="magenta" onclick="pickColor(this)"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Catatan</label>
+        <textarea class="form-textarea" id="fINote" placeholder="Detail interaksi..."></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="closeInterModal()">Batal</button>
+        <button class="btn btn-primary" onclick="saveInteraction()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   MINI CRM - LocalStorage based Customer Management
+   Data tersimpan di perangkat pengguna (browser localStorage)
+   ============================================================ */
+
+// ===== CONFIG =====
+const WHATSAPP_NUMBER = '6285536362553'; // 085536362553 -> format internasional
+const STORAGE_KEY = 'miniCRM_v1';
+const STATUS_LIST = [
+  {key:'all',label:'Semua',dot:'#9C9C9C'},
+  {key:'permanent',label:'Tetap',dot:'#34C759'},
+  {key:'hot',label:'Hot',dot:'#FF3B30'},
+  {key:'new',label:'Baru',dot:'#3BC8F5'},
+  {key:'cold',label:'Cold',dot:'#9C9C9C'}
+];
+const AVATAR_COLORS = ['#3BC8F5','#F5E625','#D6C96A','#E9A8F0','#FF9F43','#34C759','#5E5CE6','#FF6B6B'];
+
+// ===== STATE =====
+let state = {customers:[], interactions:[], fav:[]};
+let currentScreen = 'dashboard';
+let currentId = null;
+let history = ['dashboard'];
+let custFilter = 'all';
+let interFilter = 'all';
+let selectedColor = 'cyan';
+let selectedStatus = 'new';
+
+// ===== SEED DATA =====
+const SEED = {
+  customers:[
+    {id:'c1',name:'Maria Green',company:'Chemical Machinery & Ops',position:'Direktur',email:'maria@chemops.com',phone:'081234500001',status:'permanent',income:120000000,note:'Klien lama, kontrak tahunan.',color:'#3BC8F5',createdAt:Date.now()-86400000*30},
+    {id:'c2',name:'John Smith',company:'Tech Solutions, Inc.',position:'CTO',email:'john@techsol.com',phone:'081234500002',status:'hot',income:80300000,note:'Sedang evaluasi paket enterprise.',color:'#F5E625',createdAt:Date.now()-86400000*20},
+    {id:'c3',name:'Eva Robinson',company:'Alcabama Machinery & Supply',position:'CEO',email:'eva@alcabama.com',phone:'081234500003',status:'hot',income:550500000,note:'Deal besar, butuh follow-up intensif.',color:'#E9A8F0',createdAt:Date.now()-86400000*15},
+    {id:'c4',name:'Emily Davis',company:'Concrete Gravity & LLC',position:'Manajer Pembelian',email:'emily@gravity.com',phone:'081234500004',status:'new',income:1300000,note:'Baru pertama kali kontak.',color:'#D6C96A',createdAt:Date.now()-86400000*5},
+    {id:'c5',name:'David Bright',company:'Cinema Factory Supplies, Inc.',position:'Procurement Head',email:'david@cinemafactory.com',phone:'081234500005',status:'cold',income:15570000,note:'Respons lambat, perlu warming.',color:'#FF9F43',createdAt:Date.now()-86400000*45},
+    {id:'c6',name:'Sarah Johnson',company:'Manufacturing Solutions, Inc.',position:'COO',email:'sarah@mfsol.com',phone:'081234500006',status:'permanent',income:4100000,note:'Konsultan retainer bulanan.',color:'#34C759',createdAt:Date.now()-86400000*60}
+  ],
+  interactions:[
+    {id:'i1',customerId:'c3',date:'2026-10-04',title:'Royal Package Opportunity',amount:11250000,color:'cyan',note:'Presentasi paket premium, klien tertarik.',createdAt:Date.now()-86400000*10},
+    {id:'i2',customerId:'c3',date:'2026-10-11',title:'Silver Package Opportunity',amount:4160000,color:'yellow',note:'Diskusi upgrade dari paket basic.',createdAt:Date.now()-86400000*8},
+    {id:'i3',customerId:'c2',date:'2026-10-12',title:'Absolute Success Deal',amount:2100000,color:'khaki',note:'Closing deal modul tambahan.',createdAt:Date.now()-86400000*6},
+    {id:'i4',customerId:'c1',date:'2026-10-16',title:'Third Deal - Most Useful',amount:0,color:'magenta',note:'Negosiasi ulang kontrak tahunan.',createdAt:Date.now()-86400000*4},
+    {id:'i5',customerId:'c5',date:'2026-11-20',title:'Follow-up Penawaran Q4',amount:5500000,color:'cyan',note:'Kirim proposal baru.',createdAt:Date.now()-86400000*2},
+    {id:'i6',customerId:'c6',date:'2026-11-25',title:'Retainer November',amount:4100000,color:'yellow',note:'Pembayaran retainer bulanan diterima.',createdAt:Date.now()-86400000*1}
+  ]
+};
+
+// ===== STORAGE =====
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      state = JSON.parse(raw);
+      if(!Array.isArray(state.fav)) state.fav = [];
+      if(!Array.isArray(state.customers)) state.customers = [];
+      if(!Array.isArray(state.interactions)) state.interactions = [];
+      return;
+    }
+  }catch(e){console.warn('Gagal load state',e)}
+  state = JSON.parse(JSON.stringify(SEED));
+  state.fav = [];
+  saveState();
+}
+function saveState(){
+  try{localStorage.setItem(STORAGE_KEY, JSON.stringify(state));}
+  catch(e){console.warn('Gagal save state',e); toast('Gagal menyimpan data ke perangkat');}
+}
+
+// ===== HELPERS =====
+function uid(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function fmtRp(n){
+  n = Number(n)||0;
+  if(n>=1000000000) return (n/1000000000).toFixed(1).replace('.0','')+'M';
+  if(n>=1000000) return (n/1000000).toFixed(1).replace('.0','')+' jt';
+  if(n>=1000) return (n/1000).toFixed(0)+' rb';
+  return n.toString();
+}
+function fmtRpFull(n){
+  n = Number(n)||0;
+  return 'Rp '+n.toLocaleString('id-ID');
+}
+function initials(name){
+  const p = name.trim().split(/\s+/);
+  if(p.length===1) return p[0].slice(0,2).toUpperCase();
+  return (p[0][0]+p[p.length-1][0]).toUpperCase();
+}
+function avatarStyle(c){
+  return c.color ? `background:${c.color}` : '';
+}
+function statusMeta(key){
+  return STATUS_LIST.find(s=>s.key===key) || STATUS_LIST[0];
+}
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+// ===== NAVIGATION =====
+function nav(screen, pushHistory=true){
+  if(currentScreen !== screen){
+    if(pushHistory) history.push(screen);
+    currentScreen = screen;
+  }
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+screen).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    n.classList.toggle('active', n.dataset.nav===screen);
+  });
+  // Header config
+  const titles = {
+    dashboard:{title:'Mini CRM', sub:'Customer Management', back:false, search:false, star:false},
+    customers:{title:'Your Customer Network', sub:'Kelola daftar pelanggan', back:false, search:false, star:false},
+    detail:{title:'Customer Information', sub:'Detail pelanggan', back:true, search:false, star:true},
+    interactions:{title:'Interaction History', sub:'Riwayat interaksi', back:false, search:false, star:false},
+    guide:{title:'Panduan', sub:'Bantuan & pengaturan', back:false, search:false, star:false}
+  };
+  const t = titles[screen] || titles.dashboard;
+  const hTitle = document.getElementById('hTitle');
+  hTitle.innerHTML = t.title + (t.sub?`<span class="sub">${t.sub}</span>`:'');
+  document.getElementById('hBack').style.display = t.back ? 'flex' : 'none';
+  document.getElementById('hSearch').style.display = t.search ? 'flex' : 'none';
+  document.getElementById('hStar').style.display = t.star ? 'flex' : 'none';
+  // Render content per screen
+  if(screen==='dashboard') renderDashboard();
+  if(screen==='customers') renderCustomers();
+  if(screen==='detail') renderDetail();
+  if(screen==='interactions') renderInteractions();
+  if(screen==='guide') renderGuide();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function goBack(){
+  history.pop();
+  const prev = history[history.length-1] || 'dashboard';
+  currentScreen = null;
+  nav(prev, false);
+}
+
+// ===== WHATSAPP =====
+function openWA(msg){
+  const text = encodeURIComponent(msg || 'Halo, saya ingin bertanya tentang aplikasi CRM.');
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
+  window.open(url, '_blank');
+}
+
+// ===== TOAST =====
+let toastTimer;
+function toast(msg, ok=true){
+  const el = document.getElementById('toast');
+  const icon = ok ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>` : '';
+  el.innerHTML = icon + escapeHtml(msg);
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 2600);
+}
+
+// ===== DASHBOARD =====
+function renderDashboard(){
+  const totalCust = state.customers.length;
+  const totalIncome = state.customers.reduce((s,c)=>s+(Number(c.income)||0),0) + state.interactions.reduce((s,i)=>s+(Number(i.amount)||0),0);
+  const hotCount = state.customers.filter(c=>c.status==='hot').length;
+  const monthAgo = Date.now()-30*86400000;
+  const interThisMonth = state.interactions.filter(i=>new Date(i.date).getTime()>monthAgo).length;
+
+  const hour = new Date().getHours();
+  const greet = hour<11?'Selamat Pagi':hour<15?'Selamat Siang':hour<19?'Selamat Sore':'Selamat Malam';
+  document.getElementById('greetTitle').textContent = `${greet} 👋`;
+  document.getElementById('greetSub').textContent = totalCust>0 ? `Anda memiliki ${totalCust} pelanggan & ${state.interactions.length} interaksi tercatat.` : 'Mulai tambahkan pelanggan pertama Anda.';
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card">
+      <div class="ico dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <div class="val">${totalCust}</div>
+      <div class="lbl">Total Pelanggan</div>
+    </div>
+    <div class="stat-card">
+      <div class="ico yellow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+      <div class="val">${fmtRp(totalIncome)}</div>
+      <div class="lbl">Total Pendapatan</div>
+    </div>
+    <div class="stat-card">
+      <div class="ico magenta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></div>
+      <div class="val">${hotCount}</div>
+      <div class="lbl">Pelanggan Hot</div>
+    </div>
+    <div class="stat-card">
+      <div class="ico cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+      <div class="val">${interThisMonth}</div>
+      <div class="lbl">Interaksi 30 Hari</div>
+    </div>`;
+
+  // Recent customers (top 4 by createdAt desc)
+  const recent = [...state.customers].sort((a,b)=>b.createdAt-a.createdAt).slice(0,4);
+  document.getElementById('recentCust').innerHTML = recent.length ? recent.map(c=>custCardHTML(c,false)).join('') : emptyHTML('Belum ada pelanggan','Tekan tombol + di bawah untuk menambah.');
+
+  // Recent interactions (top 3)
+  const recentI = [...state.interactions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,3);
+  document.getElementById('recentInter').innerHTML = recentI.length ? recentI.map(i=>interCardHTML(i)).join('') : emptyHTML('Belum ada interaksi','Tambahkan interaksi pertama Anda.');
+}
+
+// ===== CUSTOMERS =====
+function renderCustomers(){
+  // Chips
+  const chips = document.getElementById('custChips');
+  chips.innerHTML = STATUS_LIST.map(s=>
+    `<button class="chip ${custFilter===s.key?'active':''}" onclick="setCustFilter('${s.key}')">${s.label}</button>`
+  ).join('');
+
+  const q = (document.getElementById('custSearch').value||'').toLowerCase();
+  let list = state.customers;
+  if(custFilter!=='all') list = list.filter(c=>c.status===custFilter);
+  if(q) list = list.filter(c=>(c.name+' '+c.company+' '+c.position).toLowerCase().includes(q));
+  list = list.sort((a,b)=>b.createdAt-a.createdAt);
+
+  const grid = document.getElementById('custGrid');
+  grid.innerHTML = list.length ? list.map((c,idx)=>custCardHTML(c, idx===0 && custFilter==='all')).join('') : emptyHTML('Tidak ada pelanggan','Coba ubah filter atau tambah pelanggan baru.');
+}
+function setCustFilter(k){custFilter=k; renderCustomers();}
+
+function custCardHTML(c, selected){
+  const meta = statusMeta(c.status);
+  const fav = state.fav.includes(c.id);
+  return `<div class="cust-card ${selected?'selected':''}" onclick="openDetail('${c.id}')">
+    <div class="cust-status-dot" style="background:${meta.dot}"></div>
+    <div class="cust-avatar" style="${avatarStyle(c)}">${escapeHtml(initials(c.name))}</div>
+    <div class="cust-name">${escapeHtml(c.name)}</div>
+    <div class="cust-sub">${escapeHtml(c.company||c.position||'')}</div>
+    <div class="cust-income">
+      <span>${fmtRpFull(c.income)}</span>
+      ${selected?`<span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></span>`:''}
+    </div>
+  </div>`;
+}
+
+// ===== DETAIL =====
+function openDetail(id){
+  currentId = id;
+  nav('detail');
+}
+function renderDetail(){
+  const c = state.customers.find(x=>x.id===currentId);
+  if(!c){goBack(); return;}
+  const meta = statusMeta(c.status);
+  const fav = state.fav.includes(c.id);
+  document.getElementById('hStar').classList.toggle('is-active', fav);
+
+  document.getElementById('detailHero').innerHTML = `
+    <div class="detail-avatar" style="${avatarStyle(c)}">${escapeHtml(initials(c.name))}</div>
+    <div class="detail-name">${escapeHtml(c.name)}</div>
+    <div class="detail-role">${escapeHtml(c.position||'')}${c.company?'<br>'+escapeHtml(c.company):''}</div>
+    <div class="detail-actions">
+      <a class="act-btn" href="${c.phone?'tel:'+escapeHtml(c.phone):'#'}" ${c.phone?'':'onclick="toast(\'Nomor telepon belum diisi\',false);return false"'}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      </a>
+      <a class="act-btn" href="${c.email?'mailto:'+escapeHtml(c.email):'#'}" ${c.email?'':'onclick="toast(\'Email belum diisi\',false);return false"'}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+      </a>
+      <a class="act-btn" href="#" onclick="waCustomer('${c.id}');return false">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.037zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+      </a>
+      <button class="act-btn dark" onclick="editCustomer('${c.id}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+    </div>`;
+  const totalInter = state.interactions.filter(i=>i.customerId===c.id).reduce((s,i)=>s+(Number(i.amount)||0),0);
+  document.getElementById('detailInfo').innerHTML = `
+    <div class="info-row">
+      <div class="ico-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+      <div style="flex:1"><div class="lbl">Jabatan</div><div class="val">${escapeHtml(c.position||'-')}</div></div>
+    </div>
+    <div class="info-row">
+      <div class="ico-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg></div>
+      <div style="flex:1"><div class="lbl">Perusahaan</div><div class="val">${escapeHtml(c.company||'-')}</div></div>
+    </div>
+    <div class="info-row">
+      <div class="ico-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg></div>
+      <div style="flex:1"><div class="lbl">Email</div><div class="val">${escapeHtml(c.email||'-')}</div></div>
+    </div>
+    <div class="info-row">
+      <div class="ico-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+      <div style="flex:1"><div class="lbl">Telepon</div><div class="val">${escapeHtml(c.phone||'-')}</div></div>
+    </div>
+    <div class="info-row">
+      <div class="ico-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+      <div style="flex:1"><div class="lbl">Status</div><div class="val"><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${meta.dot};display:inline-block"></span>${meta.label}</div></div>
+    </div>
+    <div class="info-row">
+      <div class="ico-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+      <div style="flex:1"><div class="lbl">Total Pendapatan</div><div class="val">${fmtRpFull(Number(c.income)+totalInter)}</div></div>
+    </div>
+    ${c.note?`<div class="info-row"><div class="ico-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div><div style="flex:1"><div class="lbl">Catatan</div><div class="val">${escapeHtml(c.note)}</div></div></div>`:''}`;
+
+  const inters = state.interactions.filter(i=>i.customerId===c.id).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  document.getElementById('detailInter').innerHTML = inters.length ? inters.map(i=>interCardHTML(i)).join('') : emptyHTML('Belum ada interaksi','Tekan + Tambah di atas untuk mencatat interaksi.');
+}
+
+function waCustomer(id){
+  const c = state.customers.find(x=>x.id===id);
+  if(!c) return;
+  let num = (c.phone||'').replace(/[^0-9]/g,'');
+  if(num.startsWith('0')) num = '62'+num.slice(1);
+  if(!num){toast('Nomor telepon pelanggan belum diisi',false); return;}
+  const msg = `Halo ${c.name}, saya menghubungi terkait kebutuhan Anda.`;
+  window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function toggleFav(){
+  if(!currentId) return;
+  const idx = state.fav.indexOf(currentId);
+  if(idx>=0) state.fav.splice(idx,1); else state.fav.push(currentId);
+  saveState();
+  renderDetail();
+  toast(idx>=0?'Dihapus dari favorit':'Ditambah ke favorit');
+}
+
+// ===== INTERACTIONS =====
+function renderInteractions(){
+  const chips = document.getElementById('interChips');
+  const custOpts = [{key:'all',label:'Semua'}].concat(state.customers.map(c=>({key:c.id,label:c.name})));
+  chips.innerHTML = custOpts.map(s=>
+    `<button class="chip ${interFilter===s.key?'active':''}" onclick="setInterFilter('${s.key}')">${escapeHtml(s.label)}</button>`
+  ).join('');
+  let list = state.interactions;
+  if(interFilter!=='all') list = list.filter(i=>i.customerId===interFilter);
+  list = list.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  document.getElementById('interList').innerHTML = list.length ? list.map(i=>interCardHTML(i)).join('') : emptyHTML('Belum ada interaksi','Tambahkan interaksi pertama Anda.');
+}
+function setInterFilter(k){interFilter=k; renderInteractions();}
+
+function interCardHTML(i){
+  const c = state.customers.find(x=>x.id===i.customerId);
+  const dateStr = new Date(i.date).toLocaleDateString('id-ID',{day:'numeric',month:'short'});
+  return `<div class="inter-card ${i.color}" onclick="editInteraction('${i.id}')">
+    <div class="i-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+    <div class="i-date">${escapeHtml(dateStr)}</div>
+    <div class="i-title">${escapeHtml(i.title)}</div>
+    ${i.amount>0?`<div class="i-amt">${fmtRpFull(i.amount)}</div>`:''}
+    ${i.note?`<div class="i-note">${escapeHtml(i.note)}</div>`:''}
+    <div class="i-meta">
+      <span class="i-cust">${c?escapeHtml(c.name):'Pelanggan dihapus'}</span>
+    </div>
+  </div>`;
+}
+
+// ===== CUSTOMER MODAL =====
+function openCustModal(){
+  document.getElementById('custModalTitle').textContent = 'Tambah Pelanggan';
+  document.getElementById('custId').value = '';
+  document.getElementById('fName').value = '';
+  document.getElementById('fCompany').value = '';
+  document.getElementById('fPosition').value = '';
+  document.getElementById('fEmail').value = '';
+  document.getElementById('fPhone').value = '';
+  document.getElementById('fIncome').value = '';
+  document.getElementById('fNote').value = '';
+  selectedStatus = 'new';
+  renderStatusPick();
+  document.getElementById('custModalBg').classList.add('show');
+  setTimeout(()=>document.getElementById('fName').focus(),300);
+}
+function closeCustModal(){document.getElementById('custModalBg').classList.remove('show');}
+
+function renderStatusPick(){
+  const el = document.getElementById('statusPick');
+  el.innerHTML = STATUS_LIST.filter(s=>s.key!=='all').map(s=>
+    `<div class="status-opt ${selectedStatus===s.key?'active':''}" onclick="pickStatus('${s.key}')">${s.label}</div>`
+  ).join('');
+}
+function pickStatus(k){selectedStatus=k; renderStatusPick();}
+
+function editCustomer(id){
+  const c = state.customers.find(x=>x.id===id);
+  if(!c) return;
+  document.getElementById('custModalTitle').textContent = 'Edit Pelanggan';
+  document.getElementById('custId').value = c.id;
+  document.getElementById('fName').value = c.name||'';
+  document.getElementById('fCompany').value = c.company||'';
+  document.getElementById('fPosition').value = c.position||'';
+  document.getElementById('fEmail').value = c.email||'';
+  document.getElementById('fPhone').value = c.phone||'';
+  document.getElementById('fIncome').value = c.income||0;
+  document.getElementById('fNote').value = c.note||'';
+  selectedStatus = c.status||'new';
+  renderStatusPick();
+  document.getElementById('custModalBg').classList.add('show');
+}
+
+function saveCustomer(){
+  const name = document.getElementById('fName').value.trim();
+  if(!name){toast('Nama pelanggan wajib diisi',false); return;}
+  const id = document.getElementById('custId').value;
+  const data = {
+    name,
+    company: document.getElementById('fCompany').value.trim(),
+    position: document.getElementById('fPosition').value.trim(),
+    email: document.getElementById('fEmail').value.trim(),
+    phone: document.getElementById('fPhone').value.trim(),
+    income: Number(document.getElementById('fIncome').value)||0,
+    note: document.getElementById('fNote').value.trim(),
+    status: selectedStatus,
+    color: AVATAR_COLORS[state.customers.length % AVATAR_COLORS.length]
+  };
+  if(id){
+    const c = state.customers.find(x=>x.id===id);
+    Object.assign(c, data);
+    toast('Pelanggan diperbarui');
+  }else{
+    const nc = {id:uid('c'), ...data, createdAt:Date.now()};
+    state.customers.push(nc);
+    toast('Pelanggan ditambahkan');
+  }
+  saveState();
+  closeCustModal();
+  if(currentScreen==='detail' && currentId===id) renderDetail();
+  else if(currentScreen==='customers') renderCustomers();
+  else nav('customers');
+}
+
+function deleteCustomer(id){
+  if(!confirm('Hapus pelanggan ini? Semua interaksi terkait juga akan dihapus.')) return;
+  state.customers = state.customers.filter(c=>c.id!==id);
+  state.interactions = state.interactions.filter(i=>i.customerId!==id);
+  state.fav = state.fav.filter(f=>f!==id);
+  saveState();
+  toast('Pelanggan dihapus');
+  goBack();
+}
+
+// ===== INTERACTION MODAL =====
+function openInterModal(custId){
+  document.getElementById('interId').value = '';
+  document.getElementById('fCust').innerHTML = state.customers.map(c=>
+    `<option value="${c.id}" ${custId===c.id?'selected':''}>${escapeHtml(c.name)}</option>`
+  ).join('');
+  if(state.customers.length===0){toast('Tambahkan pelanggan dulu',false); openCustModal(); return;}
+  document.getElementById('fDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('fAmt').value = '';
+  document.getElementById('fTitle').value = '';
+  document.getElementById('fINote').value = '';
+  selectedColor='cyan'; pickColor(document.querySelector('.color-opt.cyan'));
+  document.getElementById('interModalBg').classList.add('show');
+  setTimeout(()=>document.getElementById('fTitle').focus(),300);
+}
+function closeInterModal(){document.getElementById('interModalBg').classList.remove('show');}
+
+function pickColor(el){
+  document.querySelectorAll('.color-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  selectedColor = el.dataset.color;
+}
+
+function editInteraction(id){
+  const i = state.interactions.find(x=>x.id===id);
+  if(!i) return;
+  document.getElementById('interId').value = i.id;
+  document.getElementById('fCust').innerHTML = state.customers.map(c=>
+    `<option value="${c.id}" ${i.customerId===c.id?'selected':''}>${escapeHtml(c.name)}</option>`
+  ).join('');
+  document.getElementById('fDate').value = i.date;
+  document.getElementById('fAmt').value = i.amount||'';
+  document.getElementById('fTitle').value = i.title||'';
+  document.getElementById('fINote').value = i.note||'';
+  selectedColor = i.color||'cyan';
+  document.querySelectorAll('.color-opt').forEach(o=>o.classList.toggle('active', o.dataset.color===selectedColor));
+  document.getElementById('interModalBg').classList.add('show');
+}
+
+function saveInteraction(){
+  const custId = document.getElementById('fCust').value;
+  const title = document.getElementById('fTitle').value.trim();
+  if(!custId){toast('Pilih pelanggan',false); return;}
+  if(!title){toast('Judul interaksi wajib diisi',false); return;}
+  const id = document.getElementById('interId').value;
+  const data = {
+    customerId: custId,
+    date: document.getElementById('fDate').value || new Date().toISOString().slice(0,10),
+    amount: Number(document.getElementById('fAmt').value)||0,
+    title,
+    note: document.getElementById('fINote').value.trim(),
+    color: selectedColor
+  };
+  if(id){
+    const i = state.interactions.find(x=>x.id===id);
+    Object.assign(i, data);
+    toast('Interaksi diperbarui');
+  }else{
+    state.interactions.push({id:uid('i'), ...data, createdAt:Date.now()});
+    toast('Interaksi ditambahkan');
+  }
+  saveState();
+  closeInterModal();
+  if(currentScreen==='detail') renderDetail();
+  else if(currentScreen==='interactions') renderInteractions();
+  else nav('interactions');
+}
+
+// ===== GUIDE =====
+function renderGuide(){
+  const steps = [
+    {n:1,c:'cyan',t:'Tambah Pelanggan',d:'Tekan tombol + di navigasi bawah untuk menambah pelanggan baru. Isi nama, perusahaan, kontak, status, dan pendapatan awal.'},
+    {n:2,c:'yellow',t:'Kelola Daftar Pelanggan',d:'Buka tab Pelanggan untuk melihat semua kontak. Gunakan filter chip (Semua, Tetap, Hot, Baru, Cold) dan kolom pencarian untuk menemukan pelanggan dengan cepat.'},
+    {n:3,c:'khaki',t:'Lihat Detail Pelanggan',d:'Tekan salah satu kartu pelanggan untuk melihat detail lengkap. Anda bisa telepon, email, atau chat WhatsApp langsung dari halaman detail.'},
+    {n:4,c:'magenta',t:'Catat Interaksi',d:'Setiap kontak dengan pelanggan (penawaran, deal, follow-up) wajib dicatat. Tekan + Tambah di halaman detail pelanggan atau gunakan tab Interaksi. Pilih warna kartu untuk kategori.'},
+    {n:5,c:'cyan',t:'Pantau Dashboard',d:'Halaman Beranda menampilkan ringkasan: total pelanggan, total pendapatan, pelanggan hot, dan interaksi 30 hari terakhir. Gunakan ini untuk memantau performa.'},
+    {n:6,c:'yellow',t:'Backup Data Anda',d:'Semua data tersimpan di perangkat ini (browser). Gunakan Ekspor JSON di bawah untuk membuat cadangan secara berkala. Pindah perangkat? Impor kembali file backup Anda.'}
+  ];
+  document.getElementById('guideSteps').innerHTML = steps.map(s=>`
+    <div class="guide-step">
+      <div class="guide-num ico ${s.c}">${s.n}</div>
+      <div style="flex:1">
+        <h4>${s.t}</h4>
+        <p>${s.d}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== DATA MGMT =====
+function exportData(){
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `crm-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Data diekspor');
+}
+function importData(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const r = new FileReader();
+  r.onload = ev=>{
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(!data.customers || !data.interactions) throw new Error('Format tidak valid');
+      if(!confirm('Impor akan menimpa data saat ini. Lanjutkan?')) return;
+      state = {customers:data.customers, interactions:data.interactions, fav:data.fav||[]};
+      saveState();
+      nav('dashboard');
+      toast('Data berhasil diimpor');
+    }catch(err){toast('File tidak valid: '+err.message,false);}
+  };
+  r.readAsText(file);
+  e.target.value='';
+}
+function resetData(){
+  if(!confirm('Reset semua data ke contoh awal? Data Anda akan hilang.')) return;
+  state = JSON.parse(JSON.stringify(SEED));
+  saveState();
+  nav('dashboard');
+  toast('Data direset ke contoh');
+}
+
+// ===== SEARCH (header) =====
+function openSearch(){nav('customers'); setTimeout(()=>document.getElementById('custSearch').focus(),300);}
+
+// ===== EMPTY =====
+function emptyHTML(t,s){
+  return `<div class="empty">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    <p>${escapeHtml(t)}</p><span>${escapeHtml(s||'')}</span>
+  </div>`;
+}
+
+// ===== INIT =====
+loadState();
+nav('dashboard', false);
+// Set status pick default
+renderStatusPick();
+</script>
+</body>
+</html>
