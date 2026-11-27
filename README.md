@@ -23,8 +23,10 @@ Mengacu pada estetika dashboard CRM Salesforce: latar belakang cream hangat (`#F
 | File | Deskripsi |
 |------|-----------|
 | `index.html` | Aplikasi CRM lengkap (HTML + CSS + JS dalam satu file, self-contained) |
-| `.nojekyll` | Mencegah GitHub Pages memproses file dengan Jekyll |
+| `.nojekyll` | Mencegah GitHub Pages memproses file dengan Jekyll (file kosong) |
 | `README.md` | Dokumentasi ini |
+
+> **Catatan `.nojekyll`:** nama file diawali titik (`.`). Beberapa proses unduhan menampilkan file ini tanpa titik (`nojekyll`). Saat upload ke GitHub, pastikan nama file persis `.nojekyll` (dengan titik di awal). Untuk situs satu file `index.html` seperti ini, `.nojekyll` sebenarnya tidak wajib — GitHub Pages akan tetap menyajikan `index.html` dengan benar.
 
 ## 🚀 Cara Publish ke GitHub Pages
 
@@ -48,9 +50,9 @@ Mengacu pada estetika dashboard CRM Salesforce: latar belakang cream hangat (`#F
 3. Pada **Source**, pilih **Deploy from a branch**.
 4. Pada **Branch**, pilih `main` (atau `master`) dan folder `/ (root)`.
 5. Klik **Save**.
-6. Tunggu 1–2 menit. Halaman akan menampilkan URL publik Anda, contoh:
+6. Tunggu 1–2 menit. Halaman akan menampilkan URL publik Anda. Untuk repo bernama `crm` pada akun `yusrizalhelmi`, URL-nya:
    ```
-   https://<username>.github.io/mini-crm/
+   https://yusrizalhelmi.github.io/crm/
    ```
 
 ### Langkah 4 — Buka Aplikasi
@@ -58,10 +60,22 @@ Buka URL tersebut di browser ponsel atau desktop. Aplikasi langsung berjalan den
 
 ## 💾 Catatan Penyimpanan Data
 
-- Semua data tersimpan di **`localStorage` browser** perangkat pengguna.
+- Semua data tersimpan di **`localStorage` browser** perangkat pengguna dengan kunci unik `minicrm_v1_yusrizalhelmi`.
+- Kunci unik ini mencegah bentrok dengan proyek lain di origin yang sama (`yusrizalhelmi.github.io`), karena semua repo GitHub Pages berbagi satu origin.
+- **Migrasi otomatis:** jika kunci baru kosong tetapi kunci lama `miniCRM_v1` ada, data lama dibaca, divalidasi, lalu disalin ke kunci baru (kunci lama tidak dihapus).
+- **Perlindungan data rusak:** jika data tersimpan gagal validasi, salinan aslinya diamankan di kunci `minicrm_v1_yusrizalhelmi_corrupt_backup` dan data contoh tidak langsung menimpa data asli.
 - Data **TIDAK** sinkron antar perangkat atau antar browser.
 - Berganti perangkat/browser? Gunakan **Ekspor JSON** (di halaman Panduan) untuk backup, lalu **Impor JSON** di perangkat baru.
-- Membersihkan cache/browser akan menghapus data — selalu buat backup berkala.
+- Membersihkan cache/browser akan menghapus data — selalu buat backup berkala. Halaman Panduan menampilkan pengingat backup yang menonjol.
+
+## 🔒 Keamanan & Aksesibilitas
+
+- **Impor JSON tervalidasi:** file backup yang dimodifikasi tidak bisa menjalankan skrip (self-XSS). Saat impor, setiap `id` harus cocok pola `[A-Za-z0-9_-]`, `color` harus ada dalam daftar warna yang diizinkan, dan semua field divalidasi tipenya. Validasi yang sama juga diterapkan saat memuat dari `localStorage` (defense in depth).
+- **Zoom diaktifkan:** halaman dapat diperbesar oleh pengguna (meta viewport `width=device-width, initial-scale=1` tanpa `user-scalable=no`), sesuai WCAG 1.4.4 untuk pengguna dengan penglihatan lemah.
+- **Favicon emoji** (📊) tersedia via data URI — tidak ada request `/favicon.ico` yang 404.
+- **Tag Open Graph** (`og:title`, `og:description`, `og:type`) membuat preview link rapi saat dibagikan lewat WhatsApp/media sosial.
+- **Font cadangan:** font Poppins dimuat dari Google Fonts, dengan cadangan `system-ui, -apple-system, Segoe UI, Roboto` agar tampilan tetap rapi tanpa koneksi internet.
+- **Nomor telepon pelanggan** dinormalisasi otomatis: `0812...`, `+62812...`, `62812...`, maupun `812...` (tanpa awalan) semuanya menghasilkan link WhatsApp yang benar.
 
 ## 🔧 Kustomisasi
 
