@@ -886,11 +886,11 @@ img{max-width:100%;height:auto;display:block}
         </button>
       </div>
       <div class="data-card">
-        <h4>Reset Data</h4>
-        <p>Hapus semua data dan muat ulang data contoh awal. Tindakan ini tidak dapat dibatalkan.</p>
+        <h4>Hapus Semua Data</h4>
+        <p>Hapus total semua pelanggan dan interaksi. Data menjadi kosong sepenuhnya. Tindakan ini tidak dapat dibatalkan.</p>
         <button class="btn btn-ghost" style="color:var(--red)" onclick="resetData()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-          Reset ke Data Contoh
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Hapus Semua Data
         </button>
       </div>
 
@@ -1579,11 +1579,12 @@ function importData(e){
   e.target.value='';
 }
 function resetData(){
-  if(!confirm('Reset semua data ke contoh awal? Data Anda akan hilang.')) return;
-  state = JSON.parse(JSON.stringify(SEED));
+  if(!confirm('Hapus SEMUA data pelanggan dan interaksi? Data akan kosong sepenuhnya dan tidak dapat dikembalikan.')) return;
+  if(!confirm('Konfirmasi sekali lagi: Yakin hapus total semua data CRM Anda?')) return;
+  state = {customers:[], interactions:[], fav:[]};
   saveState();
   nav('dashboard');
-  toast('Data direset ke contoh');
+  toast('Semua data dihapus');
 }
 
 // ===== SEARCH (header) =====

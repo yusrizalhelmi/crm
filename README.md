@@ -73,7 +73,7 @@ const WHATSAPP_NUMBER = '6285536362553';
 Ganti dengan nomor Anda (format internasional tanpa `+` atau `0` di depan; nomor Indonesia diawali `62`).
 
 ### Mengubah Data Contoh
-Cari objek `SEED` di dalam `<script>` dan edit array `customers` serta `interactions`. Data contoh hanya dimuat saat pertama kali aplikasi dibuka (ketika `localStorage` masih kosong). Untuk memuat ulang data contoh, gunakan tombol **Reset ke Data Contoh** di halaman Panduan.
+Cari objek `SEED` di dalam `<script>` dan edit array `customers` serta `interactions`. Data contoh hanya dimuat saat pertama kali aplikasi dibuka (ketika `localStorage` masih kosong). Tombol **Hapus Semua Data** di halaman Panduan akan mengosongkan total semua data (pelanggan & interaksi) — data contoh tidak dimuat ulang otomatis setelah itu.
 
 ### Mengubah Warna Tema
 Edit variabel CSS di bagian `:root` dalam `<style>`:
